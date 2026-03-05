@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>More Than Four Productions</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #080808;
+  --black2: #111111;
+  --black3: #1A1A1A;
+  --panel: #0E0E0E;
+  --white: #F4F2EE;
+  --warm: #D9D4CC;
+  --muted: #6B6860;
+  --red: #D42B2B;
+  --red2: #FF3B3B;
+  --amber: #E8A020;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* ─── FILM GRAIN OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── LOADING SLATE ─── */
+.slate {
+  position: fixed;
+  inset: 0;
+  background: var(--black);
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: slateOut 0.6s ease 2.2s forwards;
+}
+
+@keyframes slateOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+.slate-clapper {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  animation: blink 0.4s step-end 3;
+}
+
+.slate-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 10vw, 100px);
+  letter-spacing: 4px;
+  color: var(--white);
+  line-height: 0.9;
+  text-align: center;
+}
+
+.slate-title span { color: var(--red); }
+
+.slate-counter {
+  margin-top: 32px;
+  width: 200px;
+  height: 2px;
+  background: var(--black3);
+  overflow: hidden;
+}
+
+.slate-counter-fill {
+  height: 100%;
+  background: var(--red);
+  animation: fillBar 2s ease forwards;
+}
+
+@keyframes fillBar { from{width:0} to{width:100%} }
+@keyframes blink { 50%{opacity:0} }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Simulated cinematic scene */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 60% 40%, rgba(212,43,43,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(232,160,32,0.04) 0%, transparent 50%),
+    linear-gradient(180deg, #050505 0%, #0D0D0D 60%, #080808 100%);
+}
+
+/* Cinematic bars */
+.hero-bar-top, .hero-bar-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  height: 80px;
+  background: #000;
+  z-index: 2;
+}
+.hero-bar-top { top: 0; }
+.hero-bar-bottom { display: none; }
+
+/* Grid lines BTS feel */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index: 1;
+}
+
+/* Timecode */
+.timecode {
+  position: absolute;
+  top: 92px;
+  left: 40px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.25);
+  z-index: 3;
+  font-variant-numeric: tabular-nums;
+}
+
+.timecode span { color: var(--red); opacity: 0.6; }
+
+.rec-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  margin-right: 8px;
+  animation: recBlink 1s step-end infinite;
+  vertical-align: middle;
+}
+@keyframes recBlink { 50%{opacity:0} }
+
+/* Corner marks */
+.corner {
+  position: absolute;
+  width: 20px; height: 20px;
+  z-index: 3;
+  opacity: 0.3;
+}
+.corner-tl { top: 92px; left: 40px; border-top: 1px solid var(--white); border-left: 1px solid var(--white); margin-top: 20px; margin-left: 0;}
+.corner-tr { top: 92px; right: 40px; border-top: 1px solid var(--white); border-right: 1px solid var(--white); margin-top: 20px; }
+.corner-bl { bottom: 64px; left: 40px; border-bottom: 1px solid var(--white); border-left: 1px solid var(--white); margin-bottom: 24px; }
+.corner-br { bottom: 64px; right: 40px; border-bottom: 1px solid var(--white); border-right: 1px solid var(--white); margin-bottom: 24px; }
+
+/* Scene label */
+.scene-label {
+  position: absolute;
+  top: 92px; right: 40px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  z-index: 3;
+  margin-top: 26px;
+  text-align: right;
+  line-height: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 4;
+  padding: 0 48px;
+  max-width: 1100px;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.8s ease 2.4s both;
+}
+
+.hero-eyebrow-line {
+  width: 48px;
+  height: 1px;
+  background: var(--red);
+}
+
+.hero-eyebrow span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 14vw, 160px);
+  letter-spacing: 2px;
+  line-height: 0.88;
+  color: var(--white);
+  animation: fadeUp 0.8s ease 2.5s both;
+}
+
+.hero h1 .outline {
+  -webkit-text-stroke: 1px rgba(244,242,238,0.3);
+  color: transparent;
+}
+
+.hero h1 .red { color: var(--red); }
+
+.hero-sub {
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--muted);
+  max-width: 480px;
+  line-height: 1.8;
+  animation: fadeUp 0.8s ease 2.7s both;
+}
+
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 40px;
+  animation: fadeUp 0.8s ease 2.9s both;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--red);
+  color: var(--white);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-primary:hover { background: var(--red2); transform: translateX(4px); }
+
+.btn-ghost {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+.btn-ghost:hover { color: var(--white); border-color: var(--white); }
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(30px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  background: var(--red);
+  overflow: hidden;
+  padding: 14px 0;
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+.marquee-item {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+  padding: 0 40px;
+  flex-shrink: 0;
+}
+
+.marquee-dot {
+  color: rgba(255,255,255,0.4);
+  padding: 0 8px;
+}
+
+/* ─── WHO WE ARE ─── */
+.about {
+  padding: 120px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: center;
+}
+
+.about-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.about-label::before { content:''; width:32px; height:1px; background:var(--red); }
+
+.about h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(42px, 6vw, 72px);
+  letter-spacing: 2px;
+  line-height: 0.95;
+  color: var(--white);
+  margin-bottom: 32px;
+}
+
+.about h2 span { color: var(--red); }
+
+.about-body {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--warm);
+  margin-bottom: 20px;
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.stat {
+  border-left: 2px solid var(--red);
+  padding-left: 20px;
+}
+
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--white);
+}
+
+.stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* BTS visual mock */
+.about-visual {
+  position: relative;
+}
+
+.bts-frame {
+  background: var(--black3);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bts-frame::before {
+  content: 'BTS';
+  position: absolute;
+  top: 16px; left: 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--red);
+  opacity: 0.5;
+}
+
+.bts-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,43,43,0.04) 0%, transparent 60%);
+}
+
+.gear-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gear-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+  z-index: 1;
+}
+.gear-item:last-child { border-bottom: none; }
+
+.gear-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--warm);
+}
+
+.gear-type {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 3px 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.bts-caption {
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 1px;
+  line-height: 1.7;
+}
+
+/* ─── SERVICES ─── */
+.services {
+  background: var(--panel);
+  padding: 120px 48px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.services-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 64px;
+}
+
+.section-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-tag::before { content:''; width:24px; height:1px; background:var(--red); }
+
+.section-h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px);
+  letter-spacing: 2px;
+  color: var(--white);
+  line-height: 0.95;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.svc-card {
+  background: var(--black2);
+  padding: 48px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.svc-card:hover { background: #161616; }
+
+.svc-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.svc-card:hover::before { transform: scaleX(1); }
+
+.svc-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px;
+  color: rgba(255,255,255,0.04);
+  position: absolute;
+  top: 16px; right: 24px;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.svc-card:hover .svc-num { color: rgba(212,43,43,0.08); }
+
+.svc-icon { font-size: 24px; margin-bottom: 24px; display: block; }
+
+.svc-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.svc-desc {
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+.svc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.svc-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--muted);
+}
+
+/* ─── PACKAGES ─── */
+.packages-section {
+  padding: 120px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pkg-section-header {
+  margin-bottom: 64px;
+}
+
+.pkg-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.pkg-card {
+  background: var(--black2);
+  border: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+.pkg-card:hover { transform: translateY(-4px); }
+.pkg-card.featured { border-color: var(--red); }
+
+.pkg-card-top {
+  height: 3px;
+  background: rgba(255,255,255,0.05);
+}
+.pkg-card.featured .pkg-card-top { background: var(--red); }
+
+.pkg-card-body { padding: 40px 32px; }
+
+.pkg-card-tier {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.pkg-card.featured .pkg-card-tier { color: var(--red); }
+
+.pkg-card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1.1;
+}
+
+.pkg-card-tagline {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.pkg-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.pkg-dollar {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.pkg-amount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 60px;
+  letter-spacing: -1px;
+  line-height: 1;
+  color: var(--white);
+}
+.pkg-card.featured .pkg-amount { color: var(--red); }
+
+.pkg-per {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.pkg-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.pkg-feature {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--warm);
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.pkg-check { color: var(--red); flex-shrink: 0; }
+.pkg-feature.dim { color: var(--muted); }
+.pkg-feature.dim .pkg-check { color: rgba(255,255,255,0.1); }
+
+.pkg-cta {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.pkg-cta:hover { border-color: var(--white); color: var(--white); }
+.pkg-card.featured .pkg-cta { background: var(--red); color: var(--white); border-color: var(--red); }
+.pkg-card.featured .pkg-cta:hover { background: var(--red2); border-color: var(--red2); }
+
+/* ─── CLIENTS ─── */
+.clients {
+  background: var(--panel);
+  padding: 80px 48px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.clients-inner { max-width: 1100px; margin: 0 auto; }
+
+.clients-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.clients-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.client-block {
+  padding: 40px 24px;
+  background: var(--black2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.client-block:hover { background: #161616; }
+
+.client-block::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; right: 50%;
+  height: 2px;
+  background: var(--red);
+  transition: left 0.4s, right 0.4s;
+}
+.client-block:hover::before { left: 0; right: 0; }
+
+.client-icon { font-size: 28px; margin-bottom: 16px; }
+
+.client-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.client-desc {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ─── CALLOUT BAND ─── */
+.callout {
+  background: var(--red);
+  padding: 80px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.callout::before {
+  content: 'MORE THAN FOUR';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 18vw, 200px);
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.04);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.callout h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 80px);
+  letter-spacing: 3px;
+  color: var(--white);
+  line-height: 0.95;
+  position: relative;
+}
+
+.callout p {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.7);
+  max-width: 560px;
+  margin: 24px auto 40px;
+  line-height: 1.8;
+  position: relative;
+}
+
+.callout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--white);
+  color: var(--red);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 16px 36px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+.callout-btn:hover { transform: scale(1.03); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--black);
+  padding: 64px 48px 40px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: end;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  margin-bottom: 32px;
+}
+
+.footer-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 2px;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.footer-brand span { color: var(--red); }
+
+.footer-tagline {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 1px;
+  line-height: 1.7;
+}
+
+.footer-contact {
+  text-align: right;
+}
+
+.footer-contact-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.footer-contact-val {
+  font-size: 13px;
+  color: var(--warm);
+  margin-bottom: 4px;
+}
+
+.footer-bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* ─── REVEAL ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .about { grid-template-columns: 1fr; gap: 48px; padding: 80px 24px; }
+  .services { padding: 80px 24px; }
+  .services-grid { grid-template-columns: 1fr; }
+  .pkg-cards { grid-template-columns: 1fr; }
+  .clients-row { grid-template-columns: 1fr 1fr; }
+  .packages-section { padding: 80px 24px; }
+  .hero-content { padding: 0 24px; }
+  .callout { padding: 64px 24px; }
+  footer { padding: 48px 24px 32px; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .footer-contact { text-align: left; }
+  .corner { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING SLATE -->
+<div class="slate">
+  <div class="slate-clapper"><span class="rec-dot"></span>SCENE 001 · TAKE 01</div>
+  <div class="slate-title">MORE<br>THAN<br><span>FOUR</span></div>
+  <div class="slate-counter"><div class="slate-counter-fill"></div></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-bar-top"></div>
+
+  <!-- BTS overlays -->
+  <div class="timecode">
+    <span class="rec-dot"></span>TC <span id="tc">00:00:00:00</span> &nbsp;·&nbsp; 4K · 24fps &nbsp;·&nbsp; ISO 800
+  </div>
+  <div class="scene-label">
+    MORE THAN FOUR PROD.<br>
+    MANILA · PH<br>
+    SC 001 · EXT
+  </div>
+
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span>Manila's Premier Content Production Studio</span>
+    </div>
+    <h1>
+      MORE<br>
+      <span class="outline">THAN</span><br>
+      <span class="red">FOUR</span>
+    </h1>
+    <p class="hero-sub">We don't just document. We direct, we craft, we deliver. Commercial-grade production for brands, campaigns, and political messaging that demand to be remembered.</p>
+    <div class="hero-cta-row">
+      <a class="btn-primary" href="#packages">VIEW PACKAGES ›</a>
+      <a class="btn-ghost" href="#services">OUR SERVICES</a>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Commercial Production</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Political Campaigns</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Brand Content</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Multimedia Artists</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Behind-The-Scenes</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Photo · Video · Direction</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Manila Philippines</span><span class="marquee-dot">◆</span>
+    <!-- repeat -->
+    <span class="marquee-item">Commercial Production</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Political Campaigns</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Brand Content</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Multimedia Artists</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Behind-The-Scenes</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Photo · Video · Direction</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Manila Philippines</span><span class="marquee-dot">◆</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section style="background:var(--black)">
+  <div class="about">
+    <div class="reveal">
+      <div class="about-label">Who We Are</div>
+      <h2>WE ARE A<br><span>PRODUCTION</span><br>HOUSE</h2>
+      <p class="about-body">More Than Four is a Manila-based multimedia production company built on one belief: every brand, every campaign, every story deserves commercial-quality execution. Our team are not just photographers and videographers — they are directors, visual storytellers, and multimedia artists who approach every project like a film set.</p>
+      <p class="about-body">From luxury brands to political campaigns, from social content to hero brand films — we bring professional gear, cinematic craft, and creative direction to every single shoot.</p>
+      <div class="about-stats">
+        <div class="stat">
+          <div class="stat-num">4+</div>
+          <div class="stat-label">Multimedia Artists on every set</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">4K</div>
+          <div class="stat-label">Cinema-grade video production</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">360°</div>
+          <div class="stat-label">Photo, video & direction</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">MNL</div>
+          <div class="stat-label">Manila-based, nationwide reach</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:0.2s">
+      <div class="bts-frame">
+        <ul class="gear-list">
+          <li class="gear-item">
+            <span class="gear-name">Sony FX6 / FX3</span>
+            <span class="gear-type">Cinema Camera</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">Sigma Art 35mm / 85mm</span>
+            <span class="gear-type">Prime Lenses</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">DJI RS3 Pro Gimbal</span>
+            <span class="gear-type">Stabilization</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">Aputure 300D II + Softbox</span>
+            <span class="gear-type">Lighting Rig</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">DJI Mavic 3 Pro</span>
+            <span class="gear-type">Aerial / Drone</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">DaVinci Resolve Studio</span>
+            <span class="gear-type">Color Grading</span>
+          </li>
+          <li class="gear-item">
+            <span class="gear-name">Adobe Creative Suite</span>
+            <span class="gear-type">Post-Production</span>
+          </li>
+        </ul>
+        <div class="bts-caption">Professional gear operated by multimedia artists — not just camera operators. Every set is directed, lit, and executed with commercial precision.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-inner">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-tag">What We Do</div>
+        <div class="section-h2">FULL-SERVICE<br>PRODUCTION</div>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card reveal">
+        <div class="svc-num">01</div>
+        <span class="svc-icon">🎬</span>
+        <div class="svc-title">Commercial Video Production</div>
+        <div class="svc-desc">Cinema-grade video campaigns shot with professional rigs. From concept to final cut — directed, graded, and delivered ready to publish or broadcast.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Reels</span>
+          <span class="svc-tag">Ad Films</span>
+          <span class="svc-tag">Hero Videos</span>
+          <span class="svc-tag">BTS Content</span>
+        </div>
+      </div>
+      <div class="svc-card reveal" style="transition-delay:0.1s">
+        <div class="svc-num">02</div>
+        <span class="svc-icon">📸</span>
+        <div class="svc-title">Brand Photography</div>
+        <div class="svc-desc">Editorial and commercial photo shoots built for premium brands. Full lighting setups, styling, and professional retouching — your brand, elevated.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Editorial</span>
+          <span class="svc-tag">Product</span>
+          <span class="svc-tag">Lifestyle</span>
+          <span class="svc-tag">Campaign</span>
+        </div>
+      </div>
+      <div class="svc-card reveal" style="transition-delay:0.2s">
+        <div class="svc-num">03</div>
+        <span class="svc-icon">🗳</span>
+        <div class="svc-title">Political Campaign Content</div>
+        <div class="svc-desc">Strategic visual content for political campaigns. We understand narrative, public image, and the media formats that move voters — produced with discretion and precision.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Ad Spots</span>
+          <span class="svc-tag">Social Content</span>
+          <span class="svc-tag">Press Kits</span>
+          <span class="svc-tag">Messaging</span>
+        </div>
+      </div>
+      <div class="svc-card reveal" style="transition-delay:0.1s">
+        <div class="svc-num">04</div>
+        <span class="svc-icon">✦</span>
+        <div class="svc-title">Luxury Brand Campaigns</div>
+        <div class="svc-desc">Aspirational content for premium brands — spas, hospitality, fashion, lifestyle. We create the kind of visuals that make people feel something before they ever buy.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Luxury</span>
+          <span class="svc-tag">Lifestyle</span>
+          <span class="svc-tag">Aspirational</span>
+          <span class="svc-tag">High-End</span>
+        </div>
+      </div>
+      <div class="svc-card reveal" style="transition-delay:0.2s">
+        <div class="svc-num">05</div>
+        <span class="svc-icon">🎞</span>
+        <div class="svc-title">Content Campaign Strategy</div>
+        <div class="svc-desc">We don't just shoot — we plan. Full content campaign strategy including shot lists, content calendars, platform-optimized formats, and multi-platform rollout.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Strategy</span>
+          <span class="svc-tag">Planning</span>
+          <span class="svc-tag">Multi-platform</span>
+        </div>
+      </div>
+      <div class="svc-card reveal" style="transition-delay:0.3s">
+        <div class="svc-num">06</div>
+        <span class="svc-icon">🖥</span>
+        <div class="svc-title">Post-Production & Editing</div>
+        <div class="svc-desc">Full post-production: color grading, sound design, motion graphics, subtitles, and ad cut-downs. Every asset optimized for its intended platform and audience.</div>
+        <div class="svc-tags">
+          <span class="svc-tag">Color Grade</span>
+          <span class="svc-tag">Motion GFX</span>
+          <span class="svc-tag">Ad Formats</span>
+          <span class="svc-tag">Audio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="packages-section" id="packages">
+  <div class="pkg-section-header reveal">
+    <div class="section-tag">Production Packages</div>
+    <div class="section-h2">CHOOSE YOUR<br>CAMPAIGN SCOPE</div>
+  </div>
+  <div class="pkg-cards">
+
+    <!-- P1 -->
+    <div class="pkg-card reveal">
+      <div class="pkg-card-top"></div>
+      <div class="pkg-card-body">
+        <div class="pkg-card-tier">Package 01 · Essential</div>
+        <div class="pkg-card-name">The Content Starter</div>
+        <div class="pkg-card-tagline">Establish your brand's visual presence with clean, consistent production assets.</div>
+        <div class="pkg-price-row">
+          <span class="pkg-dollar">$</span>
+          <span class="pkg-amount">300</span>
+          <span class="pkg-per">/ project</span>
+        </div>
+        <ul class="pkg-features">
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Half-day commercial shoot</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>15 professionally edited photos</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>2 short-form reels (30–60s)</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Captions & subtitles included</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>10 social media captions</span></li>
+          <li class="pkg-feature dim"><span class="pkg-check">▸</span><span>Cinematic brand video</span></li>
+          <li class="pkg-feature dim"><span class="pkg-check">▸</span><span>Color grading</span></li>
+          <li class="pkg-feature dim"><span class="pkg-check">▸</span><span>Ad cut-downs</span></li>
+        </ul>
+        <button class="pkg-cta">Select Package</button>
+      </div>
+    </div>
+
+    <!-- P2 FEATURED -->
+    <div class="pkg-card featured reveal" style="transition-delay:0.1s">
+      <div class="pkg-card-top"></div>
+      <div class="pkg-card-body">
+        <div class="pkg-card-tier">Package 02 · Recommended</div>
+        <div class="pkg-card-name">The Brand Campaign</div>
+        <div class="pkg-card-tagline">Full-day production — your complete core library of premium brand assets, director included.</div>
+        <div class="pkg-price-row">
+          <span class="pkg-dollar">$</span>
+          <span class="pkg-amount">620</span>
+          <span class="pkg-per">/ project</span>
+        </div>
+        <ul class="pkg-features">
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Full-day commercial set production</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>30 retouched photos + lighting setup</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>4 social media reels</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>1 cinematic brand video (60–90s)</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Prop styling & location dressing</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Cinematic color grade + licensed music</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>20 social captions</span></li>
+          <li class="pkg-feature dim"><span class="pkg-check">▸</span><span>Paid ad cut-down versions</span></li>
+        </ul>
+        <button class="pkg-cta">Select Package</button>
+      </div>
+    </div>
+
+    <!-- P3 -->
+    <div class="pkg-card reveal" style="transition-delay:0.2s">
+      <div class="pkg-card-top"></div>
+      <div class="pkg-card-body">
+        <div class="pkg-card-tier">Package 03 · Agency Level</div>
+        <div class="pkg-card-name">The Luxury Launch</div>
+        <div class="pkg-card-tagline">Full agency-grade campaign production — complete visual identity assets and paid ad materials.</div>
+        <div class="pkg-price-row">
+          <span class="pkg-dollar">$</span>
+          <span class="pkg-amount">950</span>
+          <span class="pkg-per">/ project</span>
+        </div>
+        <ul class="pkg-features">
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Full agency team — DoP, 2nd unit, artists</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>50 retouched photos, full lighting rig</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>6 platform-optimized reels</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Hero brand film (90–120s)</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>3 paid ad cut-downs (:15/:30/:60)</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Cinematic grade + licensed soundtrack</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>Ad copywriting (3 campaign sets)</span></li>
+          <li class="pkg-feature"><span class="pkg-check">▸</span><span>30 social captions</span></li>
+        </ul>
+        <button class="pkg-cta">Select Package</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CLIENT TYPES -->
+<section class="clients">
+  <div class="clients-inner">
+    <div class="clients-label reveal">Who We Work With</div>
+    <div class="clients-row">
+      <div class="client-block reveal">
+        <div class="client-icon">✦</div>
+        <div class="client-type">Luxury Brands</div>
+        <div class="client-desc">Spas, hospitality, fashion & lifestyle — aspirational content for premium audiences</div>
+      </div>
+      <div class="client-block reveal" style="transition-delay:0.1s">
+        <div class="client-icon">🗳</div>
+        <div class="client-type">Political Campaigns</div>
+        <div class="client-desc">Strategic visual content and ad campaigns for candidates and public figures</div>
+      </div>
+      <div class="client-block reveal" style="transition-delay:0.2s">
+        <div class="client-icon">◈</div>
+        <div class="client-type">Growing Brands</div>
+        <div class="client-desc">SMEs and startups ready to compete with enterprise-level visual content</div>
+      </div>
+      <div class="client-block reveal" style="transition-delay:0.3s">
+        <div class="client-icon">▲</div>
+        <div class="client-type">Agencies & Teams</div>
+        <div class="client-desc">White-label production partner for content agencies needing reliable execution</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALLOUT -->
+<section class="callout">
+  <h2>EVERY SET IS<br>A FILM SET</h2>
+  <p>We bring professional gear, artistic direction, and commercial-grade execution to every single project — regardless of budget. Because you don't get a second chance at a first impression.</p>
+  <button class="callout-btn">START YOUR CAMPAIGN ›</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">MORE THAN <span>FOUR</span></div>
+      <div class="footer-tagline">Multimedia Production Studio · Manila, Philippines<br>Photo · Video · Direction · Campaign Strategy</div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-contact-label">Get in Touch</div>
+      <div class="footer-contact-val">morethenfour@productions.ph</div>
+      <div class="footer-contact-val">Manila, Philippines</div>
+    </div>
+  </div>
+  <div class="footer-bottom" style="max-width:1100px;margin:0 auto">
+    <span>© 2025 More Than Four Productions</span>
+    <span>Built for brands that demand more.</span>
+  </div>
+</footer>
+
+<script>
+// Timecode counter
+function updateTC() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  const f = String(Math.floor(now.getMilliseconds()/41.67)).padStart(2,'0');
+  document.getElementById('tc').textContent = `${h}:${m}:${s}:${f}`;
+}
+setInterval(updateTC, 42);
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
